@@ -8,13 +8,11 @@ import numpy as np
 
 print("Starting database setup...")
 
-# --- Step 1: Load and process the original dataset (same as before) ---
 credits_df = pd.read_csv("tmdb_5000_credits.csv")
 movies_df = pd.read_csv("tmdb_5000_movies.csv")
 movies_df = movies_df.merge(credits_df, on="title")
 movies_df = movies_df[['movie_id', 'title', 'overview', 'genres', 'keywords', 'cast', 'crew']]
 
-# Helper functions to parse JSON-like strings
 def parse_json_features(features_str):
     try:
         return [feature['name'] for feature in json.loads(features_str)]
@@ -50,12 +48,10 @@ def create_tags(row):
 movies_df['tags'] = movies_df.apply(create_tags, axis=1)
 model_df = movies_df[['movie_id', 'title', 'tags']].dropna()
 
-# --- Step 2: Vectorize the data and save the vectorizer ---
 print("Vectorizing movie tags...")
 cv = CountVectorizer(max_features=5000, stop_words='english')
 vectors = cv.fit_transform(model_df['tags']).toarray()
 
-# CRITICAL: Save the CountVectorizer object to a file.
 # The worker will need this exact object to create consistent vectors for new movies.
 with open('vectorizer.pkl', 'wb') as f:
     pickle.dump(cv, f)
