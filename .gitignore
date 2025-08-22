@@ -1,0 +1,7 @@
+# .gitignore
+movienv/
+__pycache__/
+*.db
+*.pkl
+*.csv
+.env
